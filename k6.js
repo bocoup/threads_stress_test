@@ -1,6 +1,13 @@
 import { browser } from "k6/browser";
 import { sleep } from "k6";
 
+// const loginUrl = "http://localhost:3001/create-account";
+// const threadUrl =
+//   "http://localhost:3001/channels/66b53e609b145c104cdd2950/threads/66b6c03f8625485950a9bf0a";
+const loginUrl = "https://threads-vue.dev.berkmancenter.org/create-account";
+const threadUrl =
+  "https://threads-vue.dev.berkmancenter.org/channels/66b6600d3b5e2034cb1f368e/threads/66b6601a3b5e2034cb1f36a6";
+
 export const options = {
   scenarios: {
     stress_test: {
@@ -27,7 +34,7 @@ export default async function () {
     if (random < 50) {
       console.log("logging in.");
 
-      await page.locator("http://localhost:3001/create-account");
+      await page.locator(loginUrl);
       await page.waitForTimeout(5000);
 
       const testerNumber = Math.floor(Math.random() * 10000000);
@@ -59,7 +66,7 @@ export default async function () {
     } else {
       console.log("Not logging in.");
     }
-    await page.goto(__ENV.THREAD);
+    await page.goto(threadUrl);
     await page.waitForTimeout(10000);
 
     const messageTextArea = page.locator("#messageTextArea");

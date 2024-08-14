@@ -25,7 +25,7 @@ sudo apt-get install k6
 ### Running the test
 
 ```sh
-k6 run -e https://thread-uri k6.js
+k6 run k6.js
 ```
 
 You can also try:
