@@ -14,8 +14,8 @@ export const options = {
       executor: "constant-arrival-rate",
       rate: 1, // Number of virtual users to simulate per second
       duration: "10m", // Duration of the test
-      preAllocatedVUs: 100, // Number of VUs to pre-allocate before the test starts
-      maxVUs: 100, // Maximum number of VUs to scale up to during the test
+      preAllocatedVUs: 300, // Number of VUs to pre-allocate before the test starts
+      maxVUs: 300, // Maximum number of VUs to scale up to during the test
       options: {
         browser: {
           type: "chromium",
@@ -74,12 +74,12 @@ export default async function () {
     await messageTextArea.click();
     await messageTextArea.type("I am entering the chat. Hello. I am a bot.");
     await page.keyboard.down("Enter");
-    sleep(10);
+    sleep(30);
 
     for (const message of messages) {
       await messageTextArea.type(message.toString());
       await page.keyboard.press("Enter");
-      sleep(60);
+      sleep(30);
     }
   } finally {
     await page.close();
