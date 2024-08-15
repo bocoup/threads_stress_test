@@ -3,10 +3,10 @@ import { sleep } from "k6";
 
 // const loginUrl = "http://localhost:3001/create-account";
 // const threadUrl =
-//   "http://localhost:3001/channels/66b53e609b145c104cdd2950/threads/66b6c03f8625485950a9bf0a";
-const loginUrl = "https://threads-vue.dev.berkmancenter.org/create-account";
+//   "http://localhost:3001/channels/66b53e609b145c104cdd2950/threads/66be18a9fa238b6b76ad9d29";
+// const loginUrl = "https://threads-vue.dev.berkmancenter.org/create-account";
 const threadUrl =
-  "https://threads-vue.dev.berkmancenter.org/channels/66be183315ded1ce89fd0767/threads/66be185c15ded1ce89fd0777";
+  "https://threads-vue.dev.berkmancenter.org/channels/669ff4978fa73525c0244224/threads/66be188a15ded1ce89fd07a4";
 
 export const options = {
   scenarios: {
@@ -14,8 +14,8 @@ export const options = {
       executor: "constant-arrival-rate",
       rate: 1, // Number of virtual users to simulate per second
       duration: "10m", // Duration of the test
-      preAllocatedVUs: 300, // Number of VUs to pre-allocate before the test starts
-      maxVUs: 300, // Maximum number of VUs to scale up to during the test
+      preAllocatedVUs: 150, // Number of VUs to pre-allocate before the test starts
+      maxVUs: 150, // Maximum number of VUs to scale up to during the test
       options: {
         browser: {
           type: "chromium",
@@ -24,56 +24,73 @@ export const options = {
     },
   },
 };
+const latencies = [];
+export function handleSummary(data) {
+  const sum = latencies.reduce((a, b) => a + b, 0);
+  console.log(sum, latencies.length, sum / latencies.length);
+  return {
+    "summary.json": JSON.stringify({
+      data,
+    }),
+  };
+}
 
 export default async function () {
   const page = await browser.newPage();
-  const random = Math.floor(Math.random() * 100);
+  // const random = Math.floor(Math.random() * 100);
 
   try {
     // randomly choose whether to log in or not
-    if (random < 50) {
-      console.log("logging in.");
+    // if (random < 50) {
+    //   console.log("logging in.");
 
-      await page.locator(loginUrl);
-      await page.waitForTimeout(5000);
+    //   await page.locator(loginUrl);
+    //   await page.waitForTimeout(5000);
 
-      const testerNumber = Math.floor(Math.random() * 10000000);
+    //   const testerNumber = Math.floor(Math.random() * 10000000);
 
-      // Enter login credentials
-      const username = page.locator('input[placeholder="new username"]');
-      await username.type(`bot-${testerNumber}`);
-      username.dispatchEvent("input");
+    //   // Enter login credentials
+    //   const username = page.locator('input[placeholder="new username"]');
+    //   await username.type(`bot-${testerNumber}`);
+    //   username.dispatchEvent("input");
 
-      const password = page.locator('input[placeholder="password"]');
-      await password.type("password1");
-      password.dispatchEvent("input");
+    //   const password = page.locator('input[placeholder="password"]');
+    //   await password.type("password1");
+    //   password.dispatchEvent("input");
 
-      const password2 = page.locator('input[placeholder="confirm password"]');
-      await password2.type("password1");
-      password2.dispatchEvent("input");
+    //   const password2 = page.locator('input[placeholder="confirm password"]');
+    //   await password2.type("password1");
+    //   password2.dispatchEvent("input");
 
-      const email = page.locator('input[placeholder="Email (optional)"]');
+    //   const email = page.locator('input[placeholder="Email (optional)"]');
 
-      await email.type(`tester${testerNumber}@example.com`);
-      email.dispatchEvent("input");
+    //   await email.type(`tester${testerNumber}@example.com`);
+    //   email.dispatchEvent("input");
 
-      const submitButton = page.locator('input[type="submit"]');
+    //   const submitButton = page.locator('input[type="submit"]');
 
-      await Promise.all([
-        page.waitForNavigation({ waitUntil: "networkidle" }),
-        submitButton.click(),
-      ]);
-    } else {
-      console.log("Not logging in.");
-    }
+    //   await Promise.all([
+    //     page.waitForNavigation({ waitUntil: "networkidle" }),
+    //     submitButton.click(),
+    //   ]);
+    // } else {
+    // console.log("Not logging in.");
+    // }
     await page.goto(threadUrl);
     await page.waitForTimeout(10000);
+
+    const start = new Date();
 
     const messageTextArea = page.locator("#messageTextArea");
 
     await messageTextArea.click();
     await messageTextArea.type("I am entering the chat. Hello. I am a bot.");
     await page.keyboard.down("Enter");
+
+    const end = new Date();
+
+    latencies.push(end - start);
+
     sleep(30);
 
     for (const message of messages) {
